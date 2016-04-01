@@ -1,0 +1,119 @@
+<!--NewReq.html-->
+    <div class="container-fluid">
+        <div class="jumbotron" style="background-color:#000;">
+        <div class="row">
+        <div class="col-md-4 col-lg-2">
+          <img src="images/PKY Industries.png" height="150" width="150"/>
+          </div>
+           <div class="col-md-6 col-lg-10">
+          <h1 style="color:#fff; "><b>Submit New Request</b></h1>   
+          </div>
+          <div class="col-md-2 col-lg-10">
+          <div class="pull-right">
+        <div class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class="glyphicon glyphicon-menu-hamburger"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+            <li><a href="#" data-toggle="modal" data-target="#changepwd-modal">Change Password</a></li>
+            
+            <li role="separator" class="divider"></li>
+            <li><a href="#" data-toggle="modal" data-target="#logout-modal" ng-click="logout()">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+            </div>
+          </div>   
+          <br>
+          <ol class="breadcrumb">
+  <li><a ng-click="goHome()">Home</a></li>
+  
+  <li class="active">Submit New Request</li>
+</ol> 
+          </div>
+        </div>
+	
+    <div class="container " ng-show="authenticated">
+      <div class="jumbotron" style="background-color:#ccc;">
+   	 <!-- <p>{{error_message}}</p>-->
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label">Department</label>
+            <select class="form-control" ng-model="newReq.sr_department">
+              <option>
+                {{depItem[0].department}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="control-label" >Subcategory</label>
+            <select class="form-control" ng-model="curSubCat">
+              <option ng-repeat="subcat in requestCatalogue[0].subcategories">
+                {{subcat.sub_category}}
+              </option>
+            </select>
+            <select class="form-control" ng-model="curSubCat">
+              <option ng-repeat="subcat in requestCatalogue[1].subcategories">
+                {{subcat.sub_category}}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="control-label" >Request Type</label>
+            <select class="form-control">
+           <!--   <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option> -->
+            </select>
+          </div>
+          <div class="form-group">
+          	<label class="control-label" >Details</label>
+         	 <textarea class="form-control" rows="5"></textarea>
+          </div>
+          <div class="form-group">
+          </div>
+          <div class="form-group">
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-10 col-sm-10">
+              <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </div>
+          </div>
+        </form>
+        
+	</div>
+
+    </div> <!-- /container -->
+     <div class="container" ng-show="!authenticated">
+          <div class="col-md-4">
+             <button type="button" ng-click="logout()" class="btn btn-primary btn-lg btn-block">Log In</button>
+        </div>
+        </div>
+
+<div class="modal" id="logout-modal" role="dialog" >
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h4>Logout <span class="glyphicon glyphicon-off"></span></h4></div>
+      <div class="modal-body"><span class="glyphicon glyphicon-question-sign"></span> Are you sure you want to log-off?</div>
+      <div class="modal-footer"><a onclick="location.href='index.html';" class="btn btn-primary btn-block">Logout</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="changepwd-modal" role="dialog" >
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h4>Change Password <span class="glyphicon glyphicon-lock"></span></h4></div>
+      <div class="modal-body">
+      <form>
+      	<label>Enter New Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="New Password" required>
+        <label >Repeat New Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="New Password Again" required>
+       </form>
+       </div>
+      <div class="modal-footer"><a href="javascript:;" class="btn btn-primary btn-block">Change my Password</a></div>
+    </div>
+  </div>

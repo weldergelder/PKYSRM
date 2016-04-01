@@ -1,0 +1,87 @@
+<!--Home.html-->
+
+      <div class="container-fluid">
+        <div class="jumbotron" style="background-color:#000;">
+        <div class="row">
+        <div class="col-md-6 col-lg-2">
+          <img src="images/PKY Industries.png" height="150" width="150"/>
+          </div>
+           <div class="col-md-6 col-lg-10">
+          <h1 style="color:#fff; "><b>SRS</b></h1>   
+          </div>
+          <div class="col-md-2 col-lg-10">
+          <div class="pull-right">
+        <div class="dropdown">
+          <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class="glyphicon glyphicon-menu-hamburger"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+            <li><a href="#" data-toggle="modal" data-target="#changepwd-modal">Change Password</a></li>
+            
+            <li role="separator" class="divider"></li>
+            <li><a data-toggle="modal" data-target="#logout-modal" ng-click="logout()">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+            </div>
+          </div>   
+          <br>
+          <ol class="breadcrumb">
+  
+  <li class="active">Home</li>
+</ol>
+          </div>
+        </div>
+
+    <div class="container" ng-show="authenticated">
+   	 <div class="row">
+  		<div class="col-md-4"></div>
+  		<div class="col-md-4">
+            <button type="button" ng-click="goToNewReq()" class="btn btn-primary btn-lg btn-block">Submit New Request</button>
+            <button type="button" ng-click="goToAssignedReqList()" ng-show="provider" class="btn btn-default btn-lg btn-block">Assigned Reqests</button>
+            <button type="button" ng-click="goToReqList()" class="btn btn-primary btn-lg btn-block">View Current Requests</button>
+            <!--button type="button" onclick="location.href='ReqCat.html';" class="btn btn-default btn-lg btn-block">View Request Catalogue</button-->
+            <button type="button" ng-click="goToUserList()" ng-show="privilege_level" class="btn btn-default btn-lg btn-block">Manage Users</button>
+            <button type="button" ng-click="goToPendingReqList()"  ng-show="privilege_level" class="btn btn-primary btn-lg btn-block">Requests Pending Approval</button>
+            <button type="button" ng-click="logout()" class="btn btn-primary btn-md btn-block">Logout</button>
+   		</div>
+ 		<div class="col-md-4"></div>
+	</div>
+
+      
+    </div> <!-- /container -->
+
+        <div class="container" ng-show="!authenticated">
+          <div class="col-md-4">
+             <button type="button" ng-click="logout()" class="btn btn-primary btn-lg btn-block">Log In</button>
+        </div>
+        </div>
+
+    <!------------ modal ---------------
+  -->
+<div class="modal" id="logout-modal" role="dialog" >
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h4>Logout <span class="glyphicon glyphicon-off"></span></h4></div>
+      <div class="modal-body"><span class="glyphicon glyphicon-question-sign"></span> Are you sure you want to log-off?</div>
+      <div class="modal-footer"><a onclick="location.href='index.html';" class="btn btn-primary btn-block">Logout</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="changepwd-modal" role="dialog" >
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header"><h4>Change Password <span class="glyphicon glyphicon-lock"></span></h4></div>
+      <div class="modal-body">
+      <form>
+      	<label>Enter New Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="New Password" required>
+        <label >Repeat New Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="New Password Again" required>
+       </form>
+       </div>
+      <div class="modal-footer"><a href="javascript:;" class="btn btn-primary btn-block">Change my Password</a></div>
+    </div>
+  </div>
+</div>
