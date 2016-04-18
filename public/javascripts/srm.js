@@ -125,12 +125,19 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 	$scope.login = function(){
 
 		$http.post('/auth/login', $scope.user).success(function(data){
-			$rootScope.authenticated = true;
-			$rootScope.currentUser = data.user.username;
-			$rootScope.privilege_level = data.user.privilege;
-			$rootScope.provider = data.user.provider;
-			$scope.error_message = data.state;
-			$location.path('/home');
+
+
+			if(data.state == 'success') {
+				$rootScope.authenticated = true;
+				$rootScope.currentUser = data.user.username;
+				$rootScope.privilege_level = data.user.privilege;
+				$rootScope.provider = data.user.provider;
+				$location.path('/home');
+			}
+			else {
+				$scope.error_message = data.message;
+			}
+
 		})
 
 		.error(function(data){
