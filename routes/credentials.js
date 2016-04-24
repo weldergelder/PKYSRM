@@ -2,17 +2,12 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require( 'mongoose' );
 var User = mongoose.model('User');
-var bCrypt = require('bcrypt-nodejs');
-
-
-var createHash = function(password){
-	return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-};
+var authutil = require('../nodeutil/authutil.js')
 
 
 router.route('/')
 	
-	//gets all calogue items
+	//gets all users and sends them to the frontend
 	.get(function(req, res){
 		User.find(function(err, allUsers){
 			if(err){
@@ -27,14 +22,14 @@ router.route('/pwd/reset')
 	.put(function(req, res){
 		User.findOne({'username': req.body.username}, function(err, user){
 			if(err)
-				res.send(err);
-			user.password = createHash(req.body.password);
+				res.send({message: 'Error has occurred, please try later'});
+			user.password = authutil.createHash(req.body.password);
 			var newLog = {log_by: req.body.currentUser, log_detail: 'Password Change'};
 			user.log.push(newLog);
 			user.save(function(err, user){
 				if(err)
 					res.send(err);
-				res.json(user);
+				res.send(user, {message: 'Password changed successfully'});
 			});
 		});
 	});

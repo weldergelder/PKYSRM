@@ -114,6 +114,7 @@ app.factory('userService', function($resource){
 	return $resource('/cred/:username', {username:'@username'});
 });
 
+
 app.factory('srService', function($resource){
 	return $resource('/sr/:id', {id:'@id'});
 });
@@ -198,7 +199,8 @@ app.filter('filterAssignedSR', function(){
 
 app.controller('credentialManagementController', function($scope, userService, $location, $rootScope){
 	$scope.users = userService.query();
-	
+
+
 	$scope.goToNewUser = function(){
 		$location.path('/listuser/newuser');
 	}
@@ -320,7 +322,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 	$scope.resetPassword = function(){
 		$scope.dataSent = {'username': $scope.user.username,'password': $scope.user.password, 'currentUser': $rootScope.currentUser};
 		$http.put('/cred/pwd/reset', $scope.dataSent).success(function(data){
-			$scope.error_message = 'Password reset successfully';
+			$scope.error_message = data.message;
 		})
 
 		.error(function(date){

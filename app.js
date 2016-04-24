@@ -19,11 +19,12 @@ var credentials = require('./routes/credentials');
 
 if (process.env.DEV_ENV){
   mongoose.connect("mongodb://localhost/newDBTest");
+  
 }
 else
 {
   mongoose.connect("mongodb://pkysrm:123456@ds028559.mlab.com:28559/pkysrm");
-}
+}  
 
 
 var app = express();
