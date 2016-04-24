@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');   
 var User = mongoose.model('User');
 var LocalStrategy   = require('passport-local').Strategy;
-var bCrypt = require('bcrypt-nodejs');
+var authutil = require('./nodeutil/authutil.js');
 
 module.exports = function(passport){
 
@@ -34,9 +34,9 @@ module.exports = function(passport){
 						return done(null, false);                 
 					}
 					// User exists but wrong password, log the error 
-					if (!isValidPassword(user, password)){
+					if (!authutil.isValidPassword(user, password)){
 						console.log('Invalid Password');
-						return done(null, false); // redirect back to login page
+						return done(null, false);
 					}
 					// User and password both match, return user from done method
 					// which will be treated like success
@@ -74,7 +74,7 @@ module.exports = function(passport){
 
 					// set the user's local credentials
 					newUser.username = username;
-					newUser.password = createHash(password);
+					newUser.password = authutil.createHash(password);
 					newUser.department = req.body.department;
 					newUser.privilege = req.body.privilege_level;
 					newUser.provider = req.body.provider;
@@ -96,12 +96,4 @@ module.exports = function(passport){
 		})
 	);
 	
-	var isValidPassword = function(user, password){
-		return bCrypt.compareSync(password, user.password);
-	};
-	// Generates hash using bCrypt
-	var createHash = function(password){
-		return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-	};
-
 };
