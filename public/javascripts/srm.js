@@ -272,19 +272,22 @@ app.controller('addUserController', function($scope, $http, $rootScope){
 
 	$scope.signup = function(){
 		$http.post('/auth/signup', $scope.user).success(function(data){
-			$scope.error_message = data.state;
+			$scope.error_message = data.message;
+			if(data.state == 'success'){
+				$scope.user = {
+					first_name: '',
+					last_name: '',
+					username: '',
+					password: '',
+					department:'',
+					privilege_level: 0,
+					provider: 0
+				}
+			}
+
 		});
 
-		$scope.user = {
-			first_name: '',
-			last_name: '',
-			username: '',
-			password: '',
-			department:'',
-			privilege_level: 0,
-			provider: 0
 
-		};
 	};
 	
 });

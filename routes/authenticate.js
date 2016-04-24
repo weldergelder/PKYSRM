@@ -13,6 +13,14 @@ module.exports = function(passport){
 		res.send({state: 'failure', user: null, message: "Invalid username or password"});
 	});
 
+	router.get('/successsignup', function(req, res){
+		res.send({state: 'success', message: "User created successfully"});
+	});
+
+	router.get('/failuresignup', function(req, res){
+		res.send({state: 'failure', message: "Username already exists"});
+	});
+
 	//log in
 	router.post('/login', passport.authenticate('login', {
 		successRedirect: '/auth/success',
@@ -21,8 +29,8 @@ module.exports = function(passport){
 
 	//sign up
 	router.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/auth/success',
-		failureRedirect: '/auth/failure'
+		successRedirect: '/auth/successsignup',
+		failureRedirect: '/auth/failuresignup'
 	}));
 
 	//log out
