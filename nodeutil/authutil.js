@@ -3,6 +3,7 @@
 
 var bCrypt = require('bcrypt-nodejs');
 
+
 module.exports = {
 
 	//checks if the password is valid

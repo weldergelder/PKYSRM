@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var notif = require('../nodeutil/notif.js')
 
 module.exports = function(passport){
 
@@ -10,15 +11,15 @@ module.exports = function(passport){
 
 	//sends failure login state back to angular
 	router.get('/failure', function(req, res){
-		res.send({state: 'failure', user: null, message: "Invalid username or password"});
+		res.send({state: 'failure', user: null}, notif.loginError());
 	});
 
 	router.get('/successsignup', function(req, res){
-		res.send({state: 'success', message: "User created successfully"});
+		res.send({state: 'success'}, notif.userCreated());
 	});
 
 	router.get('/failuresignup', function(req, res){
-		res.send({state: 'failure', message: "Username already exists"});
+		res.send({state: 'failure'}, notif.userExists());
 	});
 
 	//log in

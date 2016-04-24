@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require( 'mongoose' );
 var User = mongoose.model('User');
-var authutil = require('../nodeutil/authutil.js')
-
+var authutil = require('../nodeutil/authutil.js');
+var notif = require('../nodeutil/notif.js');
 
 router.route('/')
 	
@@ -22,16 +22,16 @@ router.route('/pwd/reset')
 	.put(function(req, res){
 		User.findOne({'username': req.body.username}, function(err, user){
 			if(err)
-				res.send({message: 'Error has occurred, please try later'});
+				res.send(notif.errorMessage());
 			user.password = authutil.createHash(req.body.password);
 			var newLog = {log_by: req.body.currentUser, log_detail: 'Password Change'};
 			user.log.push(newLog);
 			user.save(function(err, user){
 				if(err)
-					res.send(err);
-				res.send(user, {message: 'Password changed successfully'});
+					res.send(notif.errorMessage());
+				res.send(user, notif.passwordChange());
 			});
-		});
+		}); 
 	});
 
 router.route('/pwd/reset/:username')
@@ -58,12 +58,12 @@ router.route('/:username')
 	.get(function(req, res){
 		User.findOne({'username': req.params.username}, function(err, user){
 			if(err)
-				res.send(err);
+				res.send({message: 'Error has occurred, please try later'});
 			user.save(function(err, user){
 				if(err)
-					res.send(err);
+					res.send({message: 'Error has occurred, please try later'});
 			})
-			res.json(user);
+			res.send(user);
 		});
 	}) 
 	//updates specified catalogue item
