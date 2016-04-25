@@ -34,6 +34,8 @@ router.route('/pwd/reset')
 		}); 
 	});
 
+	/*
+
 router.route('/pwd/reset/:username')
 	.put(function(req, res){
 		User.findOne({'username': req.params.username}, function(err, user){
@@ -50,7 +52,7 @@ router.route('/pwd/reset/:username')
 		});
 	});
 
-
+*/
 
 //catalogue item specific functions
 router.route('/:username')
