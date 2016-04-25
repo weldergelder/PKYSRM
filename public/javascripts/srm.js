@@ -308,11 +308,11 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 	$scope.editUser = function(){
 		$scope.dataSent = {'username': $scope.user.username, 'department': $scope.user.department, 'privilege': $scope.user.privilege,
 			'provider': $scope.user.provider, 'first_name': $scope.user.first_name, 'last_name': $scope.user.last_name, 'currentUser': $rootScope.currentUser};
-		$http.put('/cred/' + $scope.user.username, $scope.dataSent).success(function(date){
+		$http.put('/cred/' + $scope.user.username, $scope.dataSent).success(function(data){
 			$scope.error_message = 'Account updated successfully';
 		})
 
-		.error(function(date){
+		.error(function(data){
 			$scope.error_message = 'Something went wrong!';
 		});
 	} ;
@@ -320,7 +320,12 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 
 
 	$scope.resetPassword = function(){
+
+	//	$scope.dataSent = {'username': $scope.user.username, 'password': $scope.user.password, 'department': $scope.user.department, 'privilege': $scope.user.privilege,
+	//		'provider': $scope.user.provider, 'first_name': $scope.user.first_name, 'last_name': $scope.user.last_name, 'currentUser': $rootScope.currentUser};
+
 		$scope.dataSent = {'username': $scope.user.username,'password': $scope.user.password, 'currentUser': $rootScope.currentUser};
+
 		$http.put('/cred/pwd', $scope.dataSent).success(function(data){
 			$scope.error_message = data.message;
 		})

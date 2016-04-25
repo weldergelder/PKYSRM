@@ -79,7 +79,7 @@ router.route('/:username')
 			user.provider = req.body.provider;
 			user.first_name = req.body.first_name;
 			user.last_name = req.body.last_name;
-			var newLog = {log_by: req.body.currentUser, log_detail: 'change'};
+			var newLog = {log_by: req.body.currentUser, log_detail: 'Edit'};
 			user.log.push(newLog);
 			user.save(function(err, user){
 				if(err)
