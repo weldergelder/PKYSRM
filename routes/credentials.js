@@ -3,7 +3,6 @@ var router = express.Router();
 var mongoose = require( 'mongoose' );
 var User = mongoose.model('User');
 var authutil = require('../nodeutil/authutil.js');
-var notif = require('../nodeutil/notif.js');
 
 router.route('/')
 	
@@ -22,14 +21,14 @@ router.route('/pwd/reset')
 	.put(function(req, res){
 		User.findOne({'username': req.body.username}, function(err, user){
 			if(err)
-				res.send(notif.errorMessage());
+				res.send({message: 'Error has occurred, try later'});
 			user.password = authutil.createHash(req.body.password);
 			var newLog = {log_by: req.body.currentUser, log_detail: 'Password Change'};
 			user.log.push(newLog);
 			user.save(function(err, user){
 				if(err)
-					res.send(notif.errorMessage());
-				res.send(user, notif.passwordChange());
+					res.send({message: 'Error has occurred, try later'});
+				res.send(user, {message: 'Password changed successfuly'});
 			});
 		}); 
 	});
