@@ -36,20 +36,17 @@
 		<div ng-view></div>
 
 	<!--ALL INCLUDES AND JAVA SCRIPT FILES GO HERE-->
-
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 	 	<script src="javascripts/angular.min.js"></script>
 	 	<script src="javascripts/angular-route.js"></script>
 	 	<script src="javascripts/angular-resource.js"></script>
 	  	<script src="javascripts/srm.js"></script>
 		<script src="js/ie10-viewport-bug-workaround.js"></script>
-	    <script src="js/jquery.min.js"></script>
 	    <script src="js/bootstrap.min.js"></script>
 
 
 	    <script type="text/javascript">
-	    
-
-	    $(document).ready(function() {
+	      $(document).ready(function() {
 	      $(".search").keyup(function () {
 	        var searchTerm = $(".search").val();
 	        var listItem = $('table tbody').children('tr');
