@@ -13,6 +13,7 @@ router.route('/')
 			if(err){
 				return res.send(500, err);
 			}
+			res.setHeader('Cache-Control', 'no-cache');
 			return res.send(200,allUsers);
 		});
 	});
@@ -65,6 +66,7 @@ router.route('/:username')
 				if(err)
 					res.send({message: 'Error has occurred, please try later'});
 			})
+			res.setHeader('Cache-Control', 'no-cache');
 			res.send(user);
 		});
 	}) 

@@ -321,9 +321,6 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 
 	$scope.resetPassword = function(){
 
-	//	$scope.dataSent = {'username': $scope.user.username, 'password': $scope.user.password, 'department': $scope.user.department, 'privilege': $scope.user.privilege,
-	//		'provider': $scope.user.provider, 'first_name': $scope.user.first_name, 'last_name': $scope.user.last_name, 'currentUser': $rootScope.currentUser};
-
 		$scope.dataSent = {'username': $scope.user.username,'password': $scope.user.password, 'currentUser': $rootScope.currentUser};
 
 		$http.put('/cred/pwd', $scope.dataSent).success(function(data){
