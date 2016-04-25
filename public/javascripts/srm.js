@@ -324,11 +324,11 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 		$http.put('/cred/pwd/reset', $scope.dataSent).success(function(data){
 			$scope.error_message = data.message;
 		})
-
+		/*
 		.error(function(data){
 			console.log(data);
 			$scope.error_message = data.message;
-		});
+		});   */
 	};
 
 	$scope.delUser = function(){
