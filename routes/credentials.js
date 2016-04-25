@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require( 'mongoose' );
 var User = mongoose.model('User');
 var authutil = require('../nodeutil/authutil.js');
+var bCrypt = require('bcrypt-nodejs');
 
 router.route('/')
 	
@@ -22,7 +23,7 @@ router.route('/pwd/reset')
 		User.findOne({'username': req.body.username}, function(err, user){
 			if(err)
 				res.send({message: 'Error has occurred, try later'});
-			user.password = authutil.createHash(req.body.password);
+			user.password = bCrypt.hashSync(req.body.password, bCrypt.genSaltSync(10), null);
 			var newLog = {log_by: req.body.currentUser, log_detail: 'Password Change'};
 			user.log.push(newLog);
 			user.save(function(err, user){
