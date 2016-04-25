@@ -17,7 +17,7 @@ router.route('/')
 		});
 	});
 
-router.route('/pwd/reset')
+router.route('/pwd')
 
 	.put(function(req, res){
 		User.findOne({'username': req.body.username}, function(err, user){

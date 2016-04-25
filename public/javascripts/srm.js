@@ -321,14 +321,13 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 
 	$scope.resetPassword = function(){
 		$scope.dataSent = {'username': $scope.user.username,'password': $scope.user.password, 'currentUser': $rootScope.currentUser};
-		$http.put('/cred/pwd/reset', $scope.dataSent).success(function(data){
+		$http.put('/cred/pwd', $scope.dataSent).success(function(data){
 			$scope.error_message = data.message;
 		})
-		/*
+		
 		.error(function(data){
-			console.log(data);
-			$scope.error_message = data.message;
-		});   */
+			$scope.error_message = 'Error has occurred';
+		}); 
 	};
 
 	$scope.delUser = function(){
