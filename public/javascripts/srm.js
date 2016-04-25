@@ -325,7 +325,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 			$scope.error_message = data.message;
 		})
 
-		.error(function(date){
+		.error(function(data){
 			$scope.error_message = 'Process Failed';
 		});
 	};
