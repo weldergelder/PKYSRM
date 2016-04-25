@@ -29,7 +29,7 @@ router.route('/pwd')
 			user.save(function(err, user){
 				if(err)
 					res.send({message: 'Error has occurred, try later'});
-				res.send(user, {message: 'Password changed successfuly'});
+				res.json(user);
 			});
 		}); 
 	});

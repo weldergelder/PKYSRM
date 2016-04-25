@@ -327,7 +327,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 		$scope.dataSent = {'username': $scope.user.username,'password': $scope.user.password, 'currentUser': $rootScope.currentUser};
 
 		$http.put('/cred/pwd', $scope.dataSent).success(function(data){
-			$scope.error_message = data.message;
+			$scope.error_message = 'Password updated successfully';
 		})
 		
 		.error(function(data){
