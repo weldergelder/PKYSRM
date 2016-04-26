@@ -39,49 +39,44 @@
         <form class="form-horizontal">
           <div class="row">
           <div class="form-group ">
-            <div class="col-md-11 ">
+            <div class="col-md-12 ">
             <label class="control-label" >Department</label>
-            <select class="form-control dept">
+            <select class="form-control">
               <option>1</option>
               <option>2</option>
               <option>3</option>
               <option>4</option>
               <option>5</option>
               </select>
-              <input type="text" class="newdept form-control " placeholder="Type in New Department name"style="display:none;" ng-model="department">
+              <input type="text" class="form-control " placeholder="Type in New Department name" ng-model="department">
             </div>
 
-            <div class="col-md-1">
-            <button type="button" class="btn btn-primary btn-sm adddept ">Add</button>
-            <button type="button" class="btn btn-primary btn-sm submitdept " style="display:none;">Add It</button>
-            <button type="button" class="btn btn-primary btn-sm useexistingdept " style="display:none;">Use Existing</button>
-            </div>
           </div>
           </div>
           <div class="row">
           <div class="form-group ">
+
+            <div class="col-md-12"><label class="control-label" >Category</label></div>
             <div class="col-md-11 ">
-            <label class="control-label" >Category</label>
-            <select class="form-control cat">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <select class="form-control cat">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
               </select>
               <input type="text" class="newcat form-control " placeholder="Type in New Category name"style="display:none;" ng-model="sub_category">
             </div>
 
-            <div class="col-md-1">
+            <div class="pull-right">
             <button type="button" class="btn btn-primary btn-sm addcat ">Add</button>
-            <button type="button" class="btn btn-primary btn-sm submitcat " style="display:none;">Add It</button>
             <button type="button" class="btn btn-primary btn-sm useexistingcat " style="display:none;">Use Existing</button>
             </div>
           </div>
         </div>
           <div class="form-group">
             <label class="control-label" >Request Title</label>
-             <input type="text" class="newcat form-control " placeholder="Type in Title"style="display:none;" ng-model="title">
+             <input type="text" class="form-control" placeholder="Type in Title" ng-model="title">
           </div>
           <div class="form-group">
           	<label class="control-label" >Request Details</label>
@@ -97,7 +92,7 @@
           <div class="form-group">
             <label class="control-label">Estimated Duration</label>
             <select class="form-control">
-              <input type="number" class="newcat form-control " placeholder="ETA in Days"style="display:none;" ng-model="eta">
+              <input type="number" class="form-control " placeholder="ETA in Days"style="display:none;" ng-model="eta">
             </select>
           </div>
           <div class="form-group">
@@ -141,32 +136,6 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
     <script type="text/javascript">
-        $(".adddept").click(function() {
-        // assumes element with id='button'
-        $(".dept").toggle();
-        $(".newdept").toggle();
-        $(".adddept").toggle();
-        $(".submitdept").toggle();
-        $(".useexistingdept").toggle();
-    });
-
-        $(".useexistingdept").click(function() {
-        // assumes element with id='button'
-        $(".dept").toggle();
-        $(".newdept").toggle();
-        $(".adddept").toggle();
-        $(".submitdept").toggle();
-        $(".useexistingdept").toggle();
-    });
-        $(".submitdept").click(function() {
-        // assumes element with id='button'
-        $(".dept").toggle();
-        $(".newdept").toggle();
-        $(".adddept").toggle();
-        $(".submitdept").toggle();
-        $(".useexistingdept").toggle();
-        $('.newdept').val('');
-    });
         $(".addcat").click(function() {
         // assumes element with id='button'
         $(".cat").toggle();
