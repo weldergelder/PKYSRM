@@ -29,6 +29,9 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 		$location.path('/preqlist');
 	};
 
+	$rootScope.goToReqCat = function(){
+		$location.path('/reqcat');
+	};
 
 	$rootScope.logout = function(){
 		$http.get('/auth/signout');
@@ -105,6 +108,16 @@ app.config(function($routeProvider){
 		.when('/listuser/viewuser', {
 			templateUrl: 'UserView.html',
 			controller: 'editUserController'
+		})
+
+		.when('/reqcat', {
+			templateUrl: 'RequestCat.html',
+			controller: 'reqCatalogueController'
+		})
+
+		.when('/reqcat/newcat', {
+			templateUrl: 'NewCat.html',
+			controller: 'newCatController'
 		});
 
 });
@@ -144,6 +157,50 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 		.error(function(data){
 			$scope.error_message = data;
 		});
+
+	};
+
+});
+
+
+app.controller('reqCatalogueController', function($scope, $rootScope, $http, $location){
+
+	//Business Logic for Request Catalogue Screen
+	$scope.goToNewCat = function(){
+		$location.path('/reqcat/newcat');
+	}
+
+});
+
+
+app.controller('newCatController', function($scope, $rootScope, $http, $location){
+
+	//Business Logic for New Catalogue Item Screen
+
+	$scope.department = '';
+	$scope.sub_category = '';
+	$scope.title = '';
+	$scope.detail = '';
+	$scope.privilege_level = 0;
+	$scope.eta = 3;
+
+	$scope.error_message = '';
+
+	$scope.addNewCat = function(){
+		$scope.dataSent = {'department': $scope.department, 'sub_category': $scope.sub_category, 'title': $scope.title, 'privilege_level': $scope.privilege_level, 'eta': $scope.eta};
+		$http.post('/cat', $scope.dataSent).success(function(data){
+			$scope.error_message = data.message;
+			if(data.state == 'success'){
+				$scope.department = '';
+				$scope.sub_category = '';
+				$scope.title = '';
+				$scope.detail = '';
+				$scope.privilege_level = 0;
+				$scope.eta = 3;
+			}
+
+		});
+
 
 	};
 

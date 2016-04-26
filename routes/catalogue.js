@@ -9,7 +9,26 @@ router.route('/')
 	//creates a new catalogue item
 	.post(function(req, res){
 		
+		var newCatItem = new Catalogue();
+		newCatItem.department = req.body.department;
 
+		var newTitle = {'title': req.body.title, 'detail': req.body.detail, 'privilege_level': req.body.privilege_level, 'eta': req.body.eta};
+		var titles = [];
+		titles.push(newTitle);
+
+		var newCategory = {'sub_category': req.body.sub_category, 'titles': titles};
+		var subcategories = [];
+		subcategories.push(newCategory);
+
+		newCatItem.subcategories = subcategories;
+
+		newCatItem.save(function(err, newCatItem){
+			if (err)
+				return res.send({message: 'Error has occurred'});
+			return res.send({message: 'New Category Item Added', state: 'success'});
+		});
+
+/*
 		//check if department already exists
 		Catalogue.findOne({'department': req.body.department}, function(err, depItem){
 			if(err)
@@ -76,6 +95,9 @@ router.route('/')
 
 			}//end of first else
 		}); //end of findOne - Department
+
+
+		*/
 
 	})
 
