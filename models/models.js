@@ -27,11 +27,11 @@ var catalogueSchema = new mongoose.Schema({
 
 
 var serviceRequestSchema = new mongoose.Schema({
+	id: String,
 	created_by: String,
 	created_on: {type: Date, default: Date.now},
 	status: {type: String, default: 'Created'},
 	sr_title: String,
-	approval: Number,
 	sr_details: String,
 	sr_department: String,
 	resolve_by: Date,

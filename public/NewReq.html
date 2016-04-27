@@ -36,41 +36,33 @@
     <div class="container " ng-show="authenticated">
       <div class="jumbotron" style="background-color:#ccc;">
    	 <!-- <p>{{error_message}}</p>-->
-        <form class="form-horizontal">
+        <form class="form-horizontal" ng-submit="submitRequest()">
           <div class="form-group">
             <label class="control-label">Department</label>
-            <select class="form-control" ng-model="newReq.sr_department">
-              <option>
-                {{depItem[0].department}}
-              </option>
+            <select class="form-control" ng-model="sr_department" ng-click="getCategories()" required>
+              <option ng-repeat="department in departments">{{department.department}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="control-label" >Subcategory</label>
-            <select class="form-control" ng-model="curSubCat">
-              <option ng-repeat="subcat in requestCatalogue[0].subcategories">
-                {{subcat.sub_category}}
-              </option>
-            </select>
-            <select class="form-control" ng-model="curSubCat">
-              <option ng-repeat="subcat in requestCatalogue[1].subcategories">
-                {{subcat.sub_category}}
-              </option>
+            <label class="control-label" >Category</label>
+            <select class="form-control" ng-model="sr_category" ng-click="getTitles()" required>
+              <option ng-repeat="subcat in subcategories">{{subcat.subcategory}}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="control-label" >Request Type</label>
-            <select class="form-control">
-           <!--   <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option> -->
+            <label class="control-label" >Request Title</label>
+            <select class="form-control" ng-model="sr_title" ng-click="getTitleDetails()" required>
+              <option ng-repeat="title in titles">{{title}}</option>
             </select>
           </div>
+          <Label class="control-label">Description: {{sr_detail}}</Label>
+          <br>
+          <label class="control-label">ETA: {{sr_eta}}</label>
+          <br>
+          <label class="control-label">Privilege Level: {{sr_privilege_level}}</label>
           <div class="form-group">
           	<label class="control-label" >Details</label>
-         	 <textarea class="form-control" rows="5"></textarea>
+         	 <textarea class="form-control" rows="5" ng-model="sr_desc" required></textarea>
           </div>
           <div class="form-group">
           </div>
@@ -78,10 +70,11 @@
           </div>
           <div class="form-group">
             <div class="col-sm-offset-10 col-sm-10">
-              <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+              <button type="submit" class="btn btn-primary btn-lg" >Submit</button>
             </div>
           </div>
         </form>
+        <label class="control-label">{{error_message}}</label>
         
 	</div>
 

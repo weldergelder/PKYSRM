@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require( 'mongoose' );
 var ServiceRequest = mongoose.model('ServiceRequest');
-//Used for routes that must be authenticated.
+
+var moment = require('moment');
+//moment().format("YYYY-MM-DD");
 
 
 
@@ -11,23 +13,29 @@ router.route('/')
 	.post(function(req, res){
 
 		var newSR = new ServiceRequest();
+
+		newSR.id = req.body.sr_department.substring(0, 3) + moment().year().toString() + moment().date().toString() + moment().hour().toString()
+				 + moment().minute().toString() + moment().second().toString();
 		newSR.sr_department = req.body.sr_department;
 		newSR.sr_title = req.body.sr_title;
-		newSR.title = req.body.title;
-		newSR.created_by = req.body.currentUser;
-		newSR.approval = req.body.approval;
-		newSR.resolve_by = req.body.resolve_by;
+		newSR.created_by = req.body.sr_currentUser;
+		newSR.resolve_by = moment().add(req.body.sr_eta, 'days');
 		newSR.sr_details = req.body.sr_details;
-		var newLog = {log_by: req.body.currentUser, log_detail: 'create'};
-		newSR.log.push(newLog);
-		newSR.save(function(err, newSR) {
-			if (err){
-				return res.send(err);
-			}
-			return res.json(newSR);
-		});
-	})
+		if(req.body.sr_privilege_level == 1)
+			newSR.status = 'Pending';
 
+		var newLog = {'log_by': req.body.sr_currentUser, 'log_detail': 'create'};
+		newSR.log.push(newLog);
+
+
+		newSR.save(function(err, newSR) {
+			if (err)
+				return res.send({message: "Error has occurred, please contact your administrator"});
+			return res.send({message: "Service Request submitted successfully", state: "success"});
+		});
+		
+	});
+/*
 
 	//gets all catalogue items
 	.get(function(req, res){
@@ -54,6 +62,8 @@ router.route('/comment/:id')
 			});
 		});
 	});
+
+
 
 //catalogue item specific functions
 router.route('/:id')
@@ -98,5 +108,5 @@ router.route('/:id')
 			res.json('Service Request Deleted');
 		});
 	});
-
+*/
 module.exports = router;

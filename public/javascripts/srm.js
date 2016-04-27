@@ -148,6 +148,7 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 	$scope.user = {username: '', password: ''};
 	$scope.error_message = '';
 
+
 	$scope.login = function(){
 
 		$http.post('/auth/login', $scope.user).success(function(data){
@@ -521,18 +522,93 @@ app.controller('editSRController', function($scope){
 
 
 
-app.controller('submitReqController', function($scope){
+app.controller('submitReqController', function($scope, $rootScope, $http, $location, catService){
 
-	$scope.requestCatalogue = [];
+	$scope.sr_department = '';
+	$scope.sr_category = '';
+	$scope.sr_title = '';
+	$scope.sr_detail = '';
+	$scope.sr_desc = '';
+	$scope.sr_eta = '';
+	$scope.sr_privilege_level = '';
 
-
-
+	$scope.titles = {};
+	$scope.subcategories = {};
+	$scope.departments = catService.query();
 
 	$scope.newReq = {};
 
+	$scope.resetFields = function(){
+		$scope.sr_title = '';
+		$scope.sr_detail = '';
+		$scope.sr_desc = '';
+		$scope.sr_eta = '';
+		$scope.sr_privilege_level = '';
+	};
+
+	$scope.getCategories = function(){
+		//populate the select box for categories based on department selection
+		if($scope.sr_department){
+			$scope.dataSent = {'department': $scope.sr_department};
+			$http.put('/cat/catlist', $scope.dataSent).success(function(data){
+				$scope.subcategories = data;
+				$scope.resetFields();
+				$scope.titles = {};
+			})
+			.error(function(data){
+				$scope.error_message = "Error has occurred, please contact your administrator";
+			});
+		}
+
+	};
+
+	$scope.getTitleDetails = function(){
+		if($scope.sr_title){
+			$http.get('/cat/item/' + $scope.sr_title).success(function(data){
+				$scope.sr_detail = data.detail;
+				$scope.sr_eta = data.eta;
+				$scope.sr_privilege_level = data.privilege_level;
+			})
+			.error(function(data){
+				$scope.error_message = "Error has occured, please contact your administrator";
+			});
+		}
+	};
+
+	$scope.getTitles = function(){
+		if($scope.sr_category){
+			$scope.dataSent = {'sr_department': $scope.sr_department, 'sr_category': $scope.sr_category};
+			$http.post('/cat/titlelist', $scope.dataSent).success(function(data){
+				$scope.titles = data;
+				$scope.resetFields();
+			})
+			.error(function(data){
+				$scope.error_message = "Error has occurred, please contact your administrator";
+			});
+		}
+	};
 
 	$scope.submitRequest = function(){
-		
+		$scope.newReq = {
+			'sr_department': $scope.sr_department,
+			'sr_title': $scope.sr_title,
+			'sr_details': $scope.sr_desc,
+			'sr_currentUser': $rootScope.currentUser,
+			'sr_eta': $scope.sr_eta,
+			'sr_privilege_level': $scope.sr_privilege_level
+		};
+
+		$http.post('/sr', $scope.newReq).success(function(data){
+			$scope.error_message = data.message;
+			$scope.resetFields();
+			$scope.sr_category = '';
+			$scope.titles = {};
+			$scope.subcategories = {};
+		})
+		.error(function(data){
+			$scope.error_message = "Error has occurred, please contact your administrator";
+		});
+
 	}
 
 });//end of controller

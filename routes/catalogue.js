@@ -166,7 +166,23 @@ router.route('/item/:title')
 		});
 	});
 
+router.route('/titlelist')
+	//generates list of titles from a given category and department
+	.post(function(req, res){
+		Catalogue.findOne({'subcategories.sub_category': req.body.sr_category, 'department': req.body.sr_department}, {'subcategories.$': 1, "_id": 0}, function(err, item){
+			if(err)
+				res.send({message: 'Error has occurred, please try later'});
+			if(item != null){
+				var data = [];
+				item.subcategories[0].titles.forEach(function(selectedTitle){
+					data.push(selectedTitle.title);
+				})
+				res.setHeader('Cache-Control', 'no-cache');
+				res.send(data);
+			}
+		});
 
+	});
 
 router.route('/del')
 
