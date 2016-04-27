@@ -54,15 +54,15 @@
 
             <div class="col-md-12"><label class="control-label" >Category</label></div>
             <div class="col-md-11 ">
-              <select class="form-control cat" ng-model="subcategory">
+              <select class="form-control cat" ng-model="sub_category">
                 <option ng-repeat="ctg in subcategories">{{ctg.subcategory}}</option>
               </select>
               <input type="text" class="newcat form-control " placeholder="Type in New Category name"style="display:none;" ng-model="sub_category">
             </div>
 
             <div class="pull-right">
-            <button type="button" class="btn btn-primary btn-sm addcat " ng-click="toggleCat">Add New</button>
-            <button type="button" class="btn btn-primary btn-sm useexistingcat " ng-click="toggleCat" style="display:none;">Use Existing</button>
+            <button type="button" class="btn btn-primary btn-sm addcat " ng-click="toggleCat()">Add New</button>
+            <button type="button" class="btn btn-primary btn-sm useexistingcat " ng-click="toggleCat()" style="display:none;">Use Existing</button>
             </div>
           </div>
         </div>

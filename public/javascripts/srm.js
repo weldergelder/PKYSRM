@@ -286,14 +286,25 @@ app.controller('newCatController', function($scope, $rootScope, $http, $location
 	};
 
 	$scope.addNewCat = function(){
-		if($scope.toggleCategory == 0){
-			//Using an existing Category
-		}
-		else
-		{
-			//Using a new Category
+		//Using an existing Category
+		$scope.dataSent = {'department': $scope.department, 'sub_category': $scope.sub_category, 'title': $scope.title,
+				'detail': $scope.detail, 'eta': $scope.eta, 'privilege_level': $scope.privilege_level, 'toggleCat': $scope.toggleCategory};
+		$http.post('/cat', $scope.dataSent).success(function(data){
+			$scope.error_message = data.message;
+			if(data.state == 'success'){
+				$scope.department = '';
+				$scope.sub_category = '';
+				$scope.title = '';
+				$scope.detail = '';
+				$scope.privilege_level = 0;
+				$scope.eta = 3;
+			}
+		})
 
-		}
+		.error(function(data){
+			$scope.error_message = data.message;
+		});
+
 
 		/* Commented out for creating a new Department
 		$scope.dataSent = {'department': $scope.department, 'sub_category': $scope.sub_category, 'title': $scope.title, 'detail': $scope.detail,'privilege_level': $scope.privilege_level, 'eta': $scope.eta};

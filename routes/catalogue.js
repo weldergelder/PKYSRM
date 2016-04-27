@@ -8,7 +8,81 @@ var Catalogue = mongoose.model('Catalogue');
 router.route('/')
 	//creates a new catalogue item
 	.post(function(req, res){
+
+		Catalogue.findOne({'subcategories.titles.title': req.body.title}, function(err, existingTitle){
+			if(err)
+				res.send({message: 'O Error has occurred, please contact your administrator'});
+			if(existingTitle){
+				res.send({message: 'Title already exists'});
+			}
+			else
+			{
+
+				if(req.body.toggleCat == 0){
+					//Creating new title
+					Catalogue.find({'department': req.body.department}, function(err, selectedDepartment){
+
+						if(err)
+							res.send({message: 'P 1 Error has occurred, please contact your administrator'});
+
+						var newTitle = {"title": req.body.title, "eta": req.body.eta, "detail": req.body.detail, "privilege_level": req.body.privilege_level};
+
+						selectedDepartment[0].subcategories.forEach(function(subcat){
+							if(subcat.sub_category == req.body.sub_category)
+							{
+								subcat.titles.push(newTitle);
+								selectedDepartment[0].save(function(err, newRecord){
+									if(err)
+										res.send({message: "P 2 Error has occurred, please contact your administrator"});
+									res.send({message: "New title has been added", state: "success"});
+								});
+							}
+							else
+							{
+								res.send({message: "P 3 Error has occurred, please contact your administrator"});
+							}
+						})
+					})
+				}
+
+				else
+				{
+					//creating a new category with the title
+					Catalogue.find({'department': req.body.department}, function(err, selectedDepartment){
+						if(err)
+							return res.send({message:'1 Error has occurred, please contact your administrator'});
+						//checking if this category exists within this department already
+						var duplicate = false;
+						selectedDepartment[0].subcategories.forEach(function(subcat){
+							if(subcat.sub_category == req.body.sub_category)
+								duplicate = true;
+						})
+
+						if(duplicate){
+							return res.send({message: 'Category already exists within this department'});
+						}		
+						
+						else
+						{
+							var newCategory = {'sub_category': req.body.sub_category, "titles": [{'title': req.body.title, "detail": req.body.detail,
+								"privilege_level": req.body.privilege_level, "eta": req.body.eta}]};
+							selectedDepartment[0].subcategories.push(newCategory);
+							selectedDepartment[0].save(function(err, newRecord){
+								if(err)
+									return res.send({message: "2 Error has occurred, please contact your administrator"});
+								return res.send({message: "New category and title has been added", state: "success"});
+							});		
+						}
+						
+
+					})
+				}
+
+			}
+		});
+
 		
+		/* Commented out for the new Department
 		var newCatItem = new Catalogue();
 		newCatItem.department = req.body.department;
 
@@ -27,6 +101,8 @@ router.route('/')
 				return res.send({message: 'Error has occurred'});
 			return res.send({message: 'New Category Item Added', state: 'success'});
 		});
+
+		*/
 
 	})
 
@@ -95,13 +171,13 @@ router.route('/item/:title')
 router.route('/del')
 
 	.post(function(req, res){
-		console.log('just starting!');
+
 		Catalogue.findOne({'subcategories.titles.title': req.body.title}, function(err, item){
 			if(err)
 				res.send({message: 'Error has occurred, please try later'});
 
 			item.subcategories.forEach(function(subcat){
-				console.log(req.body.sub_category);
+
 				if(subcat.sub_category == req.body.sub_category){
 					subcat.titles.forEach(function(selectedTitle, index){
 						if(selectedTitle.title == req.body.title){
