@@ -35,25 +35,6 @@ router.route('/pwd')
 		}); 
 	});
 
-	/*
-
-router.route('/pwd/reset/:username')
-	.put(function(req, res){
-		User.findOne({'username': req.params.username}, function(err, user){
-			if(err)
-				res.send(err);
-			user.password = createHash(req.body.password);
-			var newLog = {log_by: req.body.currentUser, log_detail: 'Password Change'};
-			user.log.push(newLog);
-			user.save(function(err, user){
-				if(err)
-					res.send(err);
-				res.json(user.username);
-			});
-		});
-	});
-
-*/
 
 //catalogue item specific functions
 router.route('/:username')
@@ -74,7 +55,7 @@ router.route('/:username')
 	.put(function(req, res){
 		User.findOne({'username': req.params.username}, function(err, user){
 			if(err)
-				res.send(err);
+				res.send({message: 'Error has occurred, please try later'});
 
 			user.department = req.body.department;
 			user.privilege = req.body.privilege;
@@ -85,7 +66,7 @@ router.route('/:username')
 			user.log.push(newLog);
 			user.save(function(err, user){
 				if(err)
-					res.send(err);
+					res.send({message: 'Error has occurred, please try later'});
 
 				res.json(user);
 			});

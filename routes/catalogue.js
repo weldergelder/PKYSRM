@@ -28,131 +28,136 @@ router.route('/')
 			return res.send({message: 'New Category Item Added', state: 'success'});
 		});
 
-/*
-		//check if department already exists
-		Catalogue.findOne({'department': req.body.department}, function(err, depItem){
-			if(err)
-				return res.send(err);
-			if(!depItem){ //new department, create new one!
-				var newCatalogue = new Catalogue();
-				newCatalogue.department = req.body.department;
-				var newCat = {sub_category: req.body.sub_category, titles: []};
-				var newTitle = {title: req.body.title, detail: req.body.detail, eta: req.body.eta,
-					privilege_level: req.body.privilege_level, log: []};
-				var newLog = {log_detail: 'create', log_by: req.body.currentUser};
-				newTitle.log.push(newLog);
-				newCat.titles.push(newTitle);
-				newCatalogue.subcategories.push(newCat);
-
-				newCatalogue.save(function(err, newCatalogue){
-					if(err)
-						return res.send(err);
-					return res.json(newCatalogue);
-				}); //end of saving new catalogue item
-
-			} else { //department exists, check for Categories!
-				//check if category exists
-				Catalogue.findOne({'subcategories.sub_category': req.body.sub_category}, function(err, catItem){
-					if(err)
-						return res.send(err);
-					if(!catItem){ //new catalogue! Create it.
-						var newCat = {sub_category: req.body.sub_category, titles: []};
-						var newTitle = {title: req.body.title, detail: req.body.detail, eta: req.body.eta,
-							privilege_level: req.body.privilege_level, log: []};
-						var newLog = {log_detail: 'create', log_by: req.body.currentUser};
-						newTitle.log.push(newLog);
-						newCat.titles.push(newTitle);
-						depItem.subcategories.push(newCat);
-
-						//return res.send({message: 'Created new Category and Item'});
-						return res.json(depItem);
-
-					} else { //catalogue exists! Check for titles.
-						Catalogue.findOne({'subcategories.titles.title': req.body.title}, function(err, titleItem){
-							if(err)
-								return res.send(err);
-							if(!titleItem){ //new Title! Create one
-								var newTitle = {title: req.body.title, detail: req.body.detail, eta: req.body.eta,
-									privilege_level: req.body.privilege_level, log: []};
-								var newLog = {log_detail: 'create', log_by: req.body.currentUser};
-								newTitle.log.push(newLog);
-								catItem.subcategories.titles.push(newTitle);
-								return res.send({message: 'created new title'});
-
-							} else { //Title DOES exist, reject the process
-
-								return res.send({message: 'title already exists'});
-
-							} //end of third else
-
-						});// end of findOne - Title
-
-					} //end of second else
-
-				}); //end of findOne - Category
-
-
-
-			}//end of first else
-		}); //end of findOne - Department
-
-
-		*/
-
 	})
 
 	//gets all catalogue items
 	.get(function(req, res){
-		Catalogue.find(function(err, catalogueItems){
+		//Gets list of departments from mongo
+		Catalogue.find({ }, {'_id': 0, 'department': 1}, function(err, allDepartments){
 			if(err){
 				return res.send(500, err);
 			}
-			return res.send(200,catalogueItems);
+			res.setHeader('Cache-Control', 'no-cache');
+			return res.send(200,allDepartments);
+		});
+	});
+
+router.route('/item/:title')
+	//Gets details of a specific catalogue item using title
+	.get(function(req, res){
+		Catalogue.findOne({'subcategories.titles.title': req.params.title}, {'subcategories.$': 1, 'department': 1, "_id": 0}, function(err, item){
+			if(err)
+				res.send({message: 'Error has occurred, please try later'});
+			var data = {};
+			item.subcategories[0].titles.forEach(function(selectedTitle){
+				if(selectedTitle.title == req.params.title){
+					data = {'department': item.department, 'sub_category': item.subcategories[0].sub_category,
+						'title': selectedTitle.title, 'eta': selectedTitle.eta, 'detail': selectedTitle.detail,
+							'privilege_level': selectedTitle.privilege_level};
+				}
+			})
+			res.setHeader('Cache-Control', 'no-cache');
+			res.send(data);
+		});
+
+	})
+
+	.put(function(req, res){
+		//changes the details from the Edit Catalogue Item screen
+		Catalogue.findOne({'subcategories.titles.title': req.params.title}, function(err, item){
+			if(err)
+				res.send({message: 'Error has occurred, please try later'});
+
+			item.subcategories.forEach(function(subcat){
+				if(subcat.sub_category == req.body.sub_category){
+					subcat.titles.forEach(function(selectedTitle){
+						if(selectedTitle.title == req.params.title){
+							selectedTitle.title = req.body.title;
+							selectedTitle.eta = req.body.eta;
+							selectedTitle.detail = req.body.detail;
+							selectedTitle.privilege_level = req.body.privilege_level;
+						}
+					})
+				}
+			})
+
+			item.save(function(err, item){
+				if (err)
+					res.send({message: 'Error has occurred, please try later'});
+				res.send(item);
+			});
+
 		});
 	});
 
 
 
-//catalogue item specific functions
-router.route('/:id')
-	//gets specified catalogue item
-	.get(function(req, res){
-		Catalogue.findOne({'_id': id}, function(err, catItem){
+router.route('/del')
+
+	.post(function(req, res){
+		console.log('just starting!');
+		Catalogue.findOne({'subcategories.titles.title': req.body.title}, function(err, item){
 			if(err)
-				res.send(err);
-			res.json(catItem);
-		});
-	}) 
-	//updates specified catalogue item
+				res.send({message: 'Error has occurred, please try later'});
+
+			item.subcategories.forEach(function(subcat){
+				console.log(req.body.sub_category);
+				if(subcat.sub_category == req.body.sub_category){
+					subcat.titles.forEach(function(selectedTitle, index){
+						if(selectedTitle.title == req.body.title){
+							subcat.titles.splice(index, 1);
+							item.save(function(err, item){
+								if (err)
+									res.send({message: 'Error has occurred, please try later'});
+								res.send({message: 'Item has been deleted'});
+							});
+						}
+					})
+				}
+			})
+
+		})
+
+
+	});
+router.route('/catlist')
+	//used to generate list of categories in a combobox based on department selection
 	.put(function(req, res){
-		Catalogue.findOne({'_id': req.params.id}, function(err, catItem){
-			if(err)
-				res.send(err);
+		Catalogue.find({'department': req.body.department}, function(err, selectedDepartment){
+			if(err){
+				return res.send(500, err);
+			}
 
-			catItem.department = req.body.department;
-			catItem.sub_category = req.body.sub_category;
-			catItem.title = req.body.title;
-			catItem.detail = req.body.detail;
-			catItem.privilege_level = req.body.privilege_level;
-			catItem.eta = req.body.eta;
-			var newLog = {log_detail: 'change', log_by: req.body.currentUser};
-			catItem.log.push(newLog);catItem.save(function(err, catItem){
-				if(err)
-					res.send(err);
+			var data = [];
+			selectedDepartment[0].subcategories.forEach(function(subcategory){
+				var rec = {'subcategory': subcategory.sub_category};
+				data.push(rec);
+			})
+			res.setHeader('Cache-Control', 'no-cache');
+			return res.send(200, data);
+		});
+	});
 
-				res.json(catItem);
-			});
+router.route('/categories')
+
+	//used to generate the table in the SR Catalogue page
+	.put(function(req, res){
+		Catalogue.find({'department': req.body.department}, function(err, selectedDepartment){
+			if(err){
+				return res.send(500, err);
+			}
+
+			var data = [];
+			selectedDepartment[0].subcategories.forEach (function(subcategory){
+				subcategory.titles.forEach (function(title){
+					var rec = {'subcategory': subcategory.sub_category, 'title': title.title};
+					data.push(rec);
+				})
+			})  
+			res.setHeader('Cache-Control', 'no-cache');
+			return res.send(200, data);
 		});
-	})
-	//deletes the post
-	.delete(function(req, res) {
-		Catalogue.remove({
-			_id: req.params.id
-		}, function(err) {
-			if (err)
-				res.send(err);
-			res.json('Catalogue Item Deleted');
-		});
+
 	});
 
 module.exports = router;

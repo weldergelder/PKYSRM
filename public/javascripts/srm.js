@@ -8,6 +8,9 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 	$rootScope.workUser = "";
 	$rootScope.workSR = "";
 
+	$rootScope.workCat = "";
+
+
 	$rootScope.goHome = function(){
 		$location.path('/home');
 	};
@@ -118,6 +121,11 @@ app.config(function($routeProvider){
 		.when('/reqcat/newcat', {
 			templateUrl: 'NewCat.html',
 			controller: 'newCatController'
+		})
+
+		.when('/reqcat/editcat', {
+			templateUrl: 'EditCat.html',
+			controller: 'editCatController'
 		});
 
 });
@@ -125,6 +133,10 @@ app.config(function($routeProvider){
 
 app.factory('userService', function($resource){
 	return $resource('/cred/:username', {username:'@username'});
+});
+
+app.factory('catService', function($resource){
+	return $resource('/cat/:title', {title: '@title'});
 });
 
 
@@ -155,7 +167,7 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 		})
 
 		.error(function(data){
-			$scope.error_message = data;
+			$scope.error_message = "Error has occurred, please contact your administrator";
 		});
 
 	};
@@ -163,31 +175,128 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 });
 
 
-app.controller('reqCatalogueController', function($scope, $rootScope, $http, $location){
+app.controller('reqCatalogueController', function($scope, $rootScope, $http, $location, catService){
 
 	//Business Logic for Request Catalogue Screen
+	$scope.titles = [];
+	$scope.departments = catService.query();
+	$scope.selectedDepartment = '';
+	$scope.error_message = '';
+
+	//invoked upon department selection of catalogue screen
+	//displays table of all catalogue items within that department
+	$scope.getTitles = function(){
+		if($scope.selectedDepartment){
+			$scope.sentData = {'department': $scope.selectedDepartment};
+			$http.put('/cat/categories', $scope.sentData).success(function(data){
+				$scope.titles = data;
+			})
+			
+			.error(function(data){
+				$scope.error_message = "Error has occurred, please contact your administrator";
+			}); 
+		}
+
+	}
+
 	$scope.goToNewCat = function(){
 		$location.path('/reqcat/newcat');
 	}
 
+	$scope.goToCatEdit = function(catTitle){
+		$rootScope.workCat = catTitle;
+		$location.path('/reqcat/editcat');
+	}
+
 });
 
+app.controller('editCatController', function($scope, $rootScope, $http, $location, catService){
+	if($rootScope.workCat){
+		//$scope.catItem = catService.get({title: $rootScope.workCat}, function(fetchedCatItem){ });
+		$http.get('/cat/item/' + $rootScope.workCat).success(function(data){
+			$scope.catItem = data;
+		})
+		.error(function(data){
+			$scope.error_message='Error has occurred, plesae contact your administrator';
+		});
+	}
 
-app.controller('newCatController', function($scope, $rootScope, $http, $location){
+	$scope.editCat = function(){
+		$http.put('/cat/item/' + $rootScope.workCat, $scope.catItem).success(function(data){
+			$scope.error_message = 'Catalogue Item updated successfully';
+			$rootScope.workCat = $scope.catItem.title;
+		})
 
-	//Business Logic for New Catalogue Item Screen
+		.error(function(data){
+			$scope.error_message = 'Error has occurred, please contact your administrator';
+		});
+	};
 
+	$scope.delCat = function(){
+		$scope.catItem.title = $rootScope.workCat;
+		$http.post('/cat/del', $scope.catItem).success(function(data){
+			$location.path('/home');
+		})
+		.error(function(data){
+			$scope.error_message = 'Error has occurred, please contact your administrator';
+		});
+
+	};
+
+});
+
+app.controller('newCatController', function($scope, $rootScope, $http, $location, catService){
+
+	//populates list of departments
+	$scope.departments = catService.query();
+	$scope.subcategories = [];
 	$scope.department = '';
+
 	$scope.sub_category = '';
 	$scope.title = '';
 	$scope.detail = '';
 	$scope.privilege_level = 0;
 	$scope.eta = 3;
+	$scope.toggleCategory = 0;
 
 	$scope.error_message = '';
 
+	$scope.getCategories = function(){
+		//populate the select box for categories based on department selection
+		if($scope.department){
+			$scope.dataSent = {'department': $scope.department};
+			console.log($scope.department);
+			$http.put('/cat/catlist', $scope.dataSent).success(function(data){
+				$scope.subcategories = data;
+				console.log($scope.subcategories);
+			});
+		}
+
+	};
+
+	$scope.toggleCat = function(){
+		//toggle between new title and a new category
+		if($scope.toggleCategory == 0){
+			$scope.toggleCategory = 1;
+		}
+		else
+		{
+			$scope.toggleCategory = 0;
+		}
+	};
+
 	$scope.addNewCat = function(){
-		$scope.dataSent = {'department': $scope.department, 'sub_category': $scope.sub_category, 'title': $scope.title, 'privilege_level': $scope.privilege_level, 'eta': $scope.eta};
+		if($scope.toggleCategory == 0){
+			//Using an existing Category
+		}
+		else
+		{
+			//Using a new Category
+
+		}
+
+		/* Commented out for creating a new Department
+		$scope.dataSent = {'department': $scope.department, 'sub_category': $scope.sub_category, 'title': $scope.title, 'detail': $scope.detail,'privilege_level': $scope.privilege_level, 'eta': $scope.eta};
 		$http.post('/cat', $scope.dataSent).success(function(data){
 			$scope.error_message = data.message;
 			if(data.state == 'success'){
@@ -200,59 +309,13 @@ app.controller('newCatController', function($scope, $rootScope, $http, $location
 			}
 
 		});
+		*/
 
 
 	};
 
 });
 
-app.filter('filterSR', function(){
-	return function(items, search) {
-		var filtered = [];
-		if(!search){return items;}
-		angular.forEach(items, function(item) {
-			if (item.created_by == search)
-			{
-				filtered.push(item);
-			}
-		});
-		return filtered;
-	};
-})
-
-
-app.filter('filterPendingSR', function(){
-	return function(items, search) {
-		var filtered = [];
-		if(!search){return items;}
-		angular.forEach(items, function(item){
-			if(item.status == 'Pending')
-			{
-				if(item.sr_department == search)
-				{
-					filtered.push(item);
-				}
-			}
-		});
-		return filtered;
-	}
-})
-
-app.filter('filterAssignedSR', function(){
-	return function(items, search) {
-		if(!search){return items;}
-		angular.forEach(items, function(item){
-			if((item.status == 'In Progress') || (item.status == 'Created'))
-			{
-				if(item.sr_department == search)
-				{
-					filtered.push(item);
-				}
-			}
-		});
-		return filtered;
-	}
-});
 
 app.controller('credentialManagementController', function($scope, userService, $location, $rootScope){
 	$scope.users = userService.query();
@@ -277,12 +340,7 @@ app.controller('credentialManagementController', function($scope, userService, $
 });
 
 app.controller('serviceRequestView', function($scope, srService, $location, $rootScope){
-/*	$scope.servicereqs = [];
-	$scope.sr1 = {created_by: 'Yousef', title: 'Desktop not working', status: 'In Progress', created_on: '10/01/2015'};
-	$scope.sr2 = {created_by: 'Rana', title: 'Puzzle is frustrating', status: 'Pending', created_on: '11/01/2015'};
-	$scope.servicereqs.push($scope.sr1);
-	$scope.servicereqs.push($scope.sr2);*/
-
+/*
 	$scope.servicereqs = srService.query();
 
 	$scope.goToReq = function(){
@@ -296,7 +354,7 @@ app.controller('serviceRequestView', function($scope, srService, $location, $roo
 	$scope.goToAssignedReq = function(){
 		$location.path('/areqlist/areq');
 	}
-
+*/
 });
 
 
@@ -344,6 +402,10 @@ app.controller('addUserController', function($scope, $http, $rootScope){
 				}
 			}
 
+		})
+
+		.error(function(data){
+			$scope.error_message = "Error has occurred, please contact your administrator";
 		});
 
 
@@ -353,9 +415,7 @@ app.controller('addUserController', function($scope, $http, $rootScope){
 
 app.controller('editUserController', function($scope, userService, $rootScope, $http, $location){
 
-	$scope.user = userService.get({username: $rootScope.workUser}, function(fetchedUser){
-
-	});
+	$scope.user = userService.get({username: $rootScope.workUser}, function(fetchedUser){ });
 
 
 	$scope.dataSent = {};
@@ -370,7 +430,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 		})
 
 		.error(function(data){
-			$scope.error_message = 'Something went wrong!';
+			$scope.error_message = 'Error has occurred, please contact your administrator';
 		});
 	} ;
 
@@ -385,7 +445,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 		})
 		
 		.error(function(data){
-			$scope.error_message = 'Error has occurred';
+			$scope.error_message = 'Error has occurred, please contact your administrator';
 		}); 
 	};
 
@@ -394,7 +454,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 			$location.path('/home');
 		})
 		.error(function(data){
-			$scope.error_message = 'Process Failed';
+			$scope.error_message = 'Error has occurred, please contact your administrator';
 		});
 	};
 
@@ -402,7 +462,7 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 
 app.controller('editSRController', function($scope){
 
-
+/*
 	$scope.servicereq = {
 	created_by: 'Yousef',
 	created_on: '10/01/2015',
@@ -445,157 +505,23 @@ app.controller('editSRController', function($scope){
 		$scope.servicereq.comments.push($scope.newComment);
 		$scope.new_comment = '';
 	}
-	
+	*/
 });
 
 
 
 app.controller('submitReqController', function($scope){
 
-	$scope.requestCatalogue = [ //beginning of collection
-	{//beginning of first department entry
-		department: 'Information Technology',
-		subcategories: [
-		{
-			sub_category: 'Desktop Support',
-			titles: [
-			{
-				title: 'Power Issue',
-				detail: 'Equipment does not turn on',
-				privilege_level: 0,
-				eta: 1
-			},//end of first title
-			{
-				title: 'System Access',
-				detail: 'Unable to log into ERP',
-				privilege_level: 0,
-				eta: 1
-			},//end of second title
-			{
-				title: 'Network Access',
-				detail: 'IP Phone and Network Issues',
-				privilege_level: 0,
-				eta: 1
-			},//end of third title
-			{
-				title: 'Request new device',
-				detail: 'Request replacement of Computer',
-				privilege_level: 1,
-				eta: 1
-			}//end of third title
-			]//end of title array
-
-		},//end of first subcategory
-		{//start of second subcategory
-			sub_category: 'Software Licensing',
-			titles: [
-			{
-				title: 'Microsoft Office',
-				detail: 'Request Office HUL',
-				privilege_level: 1,
-				eta: 3
-			},
-			{
-				title: 'MSDN Account',
-				detail: 'Request MSDN Account Access',
-				privilege_level: 1,
-				eta: 3
-			}
-			]//end of second title array
-
-		}//end of second subcategory
-		]//end of first subcategory array
-	},//end of first department entry
-	{//beginning of second department
-		department: 'Administration',
-		subcategories: [
-		{
-			sub_category: 'Room Reservations',
-			titles: [
-			{
-				title: 'Meeting Room #1',
-				detail: 'Capacity = 20',
-				privilege_level: 1,
-				eta: 1
-			},
-			{
-				title: 'Meeting Room #2',
-				detail: 'Capacity = 40',
-				privilege_level: 1,
-				eta: 1
-			},
-			{
-				title: 'Meeting Room #3',
-				detail: 'Capacity = 10',
-				privilege_level: 0,
-				eta: 1
-			}//end of third title for room reservations
-			]//end of first titles array for reservations
-
-		},//end of first subcategory
-		{//start of second subcategory
-			sub_category: 'Supplies',
-			titles: [
-			{
-				title: 'Printer Toner',
-				detail: 'Please specify printer model and needed color',
-				privilege_level: 1,
-				eta: 3
-			},
-			{//start of second title
-				title: 'Stationary',
-				detail: 'Desk supplies',
-				privilege_level: 0,
-				eta: 3
-			}//end of second title
-
-			]//end of second titles array
-
-		}//end of second subcategory
-		]//end of first subcategory array for admin
-	}//end of second department
-	]; //end of collection
+	$scope.requestCatalogue = [];
 
 
 
 
-	$scope.newReq = {
-		created_by: 'Yousef',
-		created_on: Date.now(),
-		status: 'Created',
-		sr_title: '',
-		approval: 0,
-		sr_details: '',
-		sr_department: ''
-	};
+	$scope.newReq = {};
 
 
 	$scope.submitRequest = function(){
-		//$scope.error_message = $scope.newReq;
+		
 	}
 
-	/*
-	$scope.curSubCat = '';
-	$scope.i=0;
-	$scope.selectedDept = $scope.requestCatalogue[$scope.i];
-
-	$scope.loadCategory = function(){
-
-		if ($scope.i)
-			$scope.i = 0;
-		else
-			$scope.i = 1;
-
-		$scope.error_message = $scope.i;
-		/*angular.forEach($scope.requestCatalogue, function(value, key){
-				$scope.error_message = value.department + " " + $scope.newReq.sr_department;
-				if (true){
-					$scope.error_message = "hello";
-					$scope.selectedDept = $scope.requestCatalogue[key];
-				}
-				//$scope.error_message = $scope.selectedDept;
-			});
-	}
-
-*/
 });//end of controller
