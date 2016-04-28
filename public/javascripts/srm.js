@@ -10,6 +10,7 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 
 	$rootScope.workCat = "";
 
+	$rootScope.workRole = "";
 
 	$rootScope.goHome = function(){
 		$location.path('/home');
@@ -20,6 +21,7 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 	};
 
 	$rootScope.goToAssignedReqList = function(){
+		$rootScope.workRole = "Provider";
 		$location.path('/areqlist');
 	};
 
@@ -29,6 +31,7 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 
 
 	$rootScope.goToPendingReqList = function(){
+		$rootScope.workRole = "Manager";
 		$location.path('/preqlist');
 	};
 
@@ -163,6 +166,7 @@ app.controller('authController', function($scope, $rootScope, $http, $location){
 				$rootScope.currentUser = data.user.username;
 				$rootScope.privilege_level = data.user.privilege;
 				$rootScope.provider = data.user.provider;
+				$rootScope.loggedDepartment = data.user.department;
 				$location.path('/home');
 			}
 			else {
@@ -270,10 +274,8 @@ app.controller('newCatController', function($scope, $rootScope, $http, $location
 		//populate the select box for categories based on department selection
 		if($scope.department){
 			$scope.dataSent = {'department': $scope.department};
-			console.log($scope.department);
 			$http.put('/cat/catlist', $scope.dataSent).success(function(data){
 				$scope.subcategories = data;
-				console.log($scope.subcategories);
 			});
 		}
 
@@ -355,10 +357,14 @@ app.controller('credentialManagementController', function($scope, userService, $
 
 });
 
+app.factory('srListService', function($resource){
+	//Used for generating lists on privileged users and services providers views
+	return $resource('/sr/list/:user/:department', {user:'@user', department: '@department'});
+});
 
+app.controller('serviceRequestView', function($scope, $http, srService, srListService, $location, $rootScope){
 
-app.controller('serviceRequestView', function($scope, $http, srService, $location, $rootScope){
-
+	//getting SRs created by logged user
 	if($rootScope.currentUser){
 		$scope.servicereqs = srService.query({currentUser: $rootScope.currentUser}, function(fetchedUser){ },
 			function(fetchedUser){
@@ -366,22 +372,46 @@ app.controller('serviceRequestView', function($scope, $http, srService, $locatio
 		});
 	}
 
-	console.log($scope.servicereqs);
+	//getting SRs the user should service
+	if($rootScope.provider){
+		if($rootScope.workRole == "Provider"){
+			$scope.assignedServiceReqs = srListService.query({department: $rootScope.loggedDepartment, user: 'provider'}, 
+				function(fetchedSRs){
+					//success
+					console.log($rootScope.loggedDepartment);
+				},
+				function(fetchedSRs){
+					$scope.error_message = "Error has occurred, please contact your adminisrator";
+				});
+		}
+	}
+
+	//getting SRs the user should approve/cancel
+	if($rootScope.privilege_level){
+		if($rootScope.workRole == "Manager"){
+			$scope.pendingServiceReqs = srListService.query({department: $rootScope.loggedDepartment, user: 'mgr'}, function(fetchedSRs){ },
+				function(fetchedSRs){
+					$scope.error_message = "Error has occurred, please contact your adminisrator";
+				});
+		}
+	}
 
 	
 	$scope.goToReq = function(sr){
 		$rootScope.workSR = sr;
 		$location.path('/reqlist/req');
 	}
-	/*
-	$scope.goToPendingReq = function(){
+	
+	$scope.goToPendingReq = function(sr){
+		$rootScope.workSR = sr;
 		$location.path('/preqlist/preq');
 	}
-
-	$scope.goToAssignedReq = function(){
+	
+	$scope.goToAssignedReq = function(sr){
+		$rootScope.workSR = sr;
 		$location.path('/areqlist/areq');
 	}
-	*/
+
 
 });
 
@@ -536,6 +566,10 @@ app.controller('editSRController', function($scope, $rootScope, $http, srViewSer
 
 	$scope.cancelSR = function(){
 		$scope.servicereq.status = 'Canceled';
+	}
+
+	$scope.editSR = function(){
+		
 	}
 */
 });

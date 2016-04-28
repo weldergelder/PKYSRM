@@ -43,10 +43,10 @@
         <thead>
           <tr>
               
-              <th class="text-center" data-field="createdby">Created By</th>
+              <th class="text-center" data-field="createdby">ID</th>
               <th class="text-center" data-field="title">Title</th>
               <th class="text-center" data-field="status">Status</th>
-              <th class="text-center" data-field="date">Date Created</th>
+              <th class="text-center" data-field="date">Due Date</th>
               <th class="text-center" data-field="action">Action</th>
           </tr>
           <tr class="warning no-result">
@@ -55,13 +55,13 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="servicereq in servicereqs | orderBy: 'servicereq.created_on':true | filterAssignedSR:loggedDepartment">
-            <td>{{servicereq.created_by}}</td>
+          <tr ng-repeat="servicereq in assignedServiceReqs | orderBy: 'servicereq.resolve_by':false">
+            <td>{{servicereq.id}}</td>
             <td>{{servicereq.sr_title}}</td>
-            <td>{{servicereq.sr_department}}</td> 
-            <td>{{servicereq.created_on}}</td>   
+            <td>{{servicereq.status}}</td> 
+            <td>{{servicereq.resolve_by | date:"MMM d, y"}}</td>   
             <td>
-            <button type="button" ng-click="goToAssignedReq()" class="btn btn-success btn-sm">
+            <button type="button" ng-click="goToAssignedReq(servicereq.id)" class="btn btn-success btn-sm">
               <span class="glyphicon glyphicon-eye-open"></span>
             </button>
             </td>
@@ -112,4 +112,38 @@
 
 <!------------ /modal ----------------->
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    
+      
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+      <script type="text/javascript">
+      
+
+      $(document).ready(function() {
+        $(".search").keyup(function () {
+          var searchTerm = $(".search").val();
+          var listItem = $('table tbody').children('tr');
+          var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+          
+        $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+              return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+          }
+        });
+          
+        $("table tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+          $(this).attr('visible','false');
+        });
+
+        $("table tbody tr:containsi('" + searchSplit + "')").each(function(e){
+          $(this).attr('visible','true');
+        });
+
+        var jobCount = $('table tbody tr[visible="true"]').length;
+          
+
+        if(jobCount == '0') {$('.no-result').show();}
+          else {$('.no-result').hide();}
+            });
+       });
+
+
+      </script>

@@ -4,7 +4,6 @@ var mongoose = require( 'mongoose' );
 var ServiceRequest = mongoose.model('ServiceRequest');
 
 var moment = require('moment');
-//moment().format("YYYY-MM-DD");
 
 
 
@@ -26,8 +25,6 @@ router.route('/')
 
 		var newLog = {'log_by': req.body.sr_currentUser, 'log_detail': 'create'};
 		newSR.log.push(newLog);
-		//var newComment = {'com_by': '', 'com_text': ''};
-		//newSR.comments.push(newComment);
 
 		newSR.save(function(err, newSR) {
 			if (err)
@@ -43,6 +40,7 @@ router.route('/:currentUser')
 	.get(function(req, res){
 		ServiceRequest.find({'created_by': req.params.currentUser}, function(err, allSR){
 			if(err){
+				res.setHeader('Cache-Control', 'no-cache');
 				return res.send(err);
 			}
 			res.setHeader('Cache-Control', 'no-cache');
@@ -50,15 +48,36 @@ router.route('/:currentUser')
 		});
 	});
 
-router.route('/list')
-	//gets catalogue items made by a single user
-	.put(function(req, res){
-		ServiceRequest.find({'created_by': req.body.currentUser}, function(err, allSR){
-			if(err){
-				return res.send(err);
+router.route('/list/:user/:department')
+	//gets list of SRs for privileged users and service providers
+	.get(function(req, res){
+		if(req.params.user == 'mgr'){
+			ServiceRequest.find({'sr_department': req.params.department, 'status': 'Pending'}, function(err, allSR){
+				if(err){
+					res.setHeader('Cache-Control', 'no-cache');
+					return res.send(err);
+				}
+				res.setHeader('Cache-Control', 'no-cache');
+				return res.send(200,allSR);
+			});
+		}
+
+		else{
+			if(req.params.user == 'provider'){
+				ServiceRequest.find({'sr_department': req.params.department, $or: [ { 'status': 'Created'}, { 'status': 'In Progress'}]}, function(err, allSR){
+					if(err){
+						res.setHeader('Cache-Control', 'no-cache');
+						return res.send(err);
+					}
+					res.setHeader('Cache-Control', 'no-cache');
+					return res.send(200,allSR);
+				});
 			}
-			return res.send(200,allSR);
-		});
+			else{
+				res.setHeader('Cache-Control', 'no-cache');
+				res.send({message: "Insufficient credentials"});
+			}
+		}
 	});
 
 //adding a new comment
