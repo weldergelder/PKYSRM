@@ -102,47 +102,35 @@ router.route('/item/:id')
 	//gets specified catalogue item with given id
 	.get(function(req, res){
 		ServiceRequest.findOne({'id': req.params.id}, function(err, sr){
-			if(err)
+			if(err){
+				res.setHeader('Cache-Control', 'no-cache');
 				res.send(err);
+			}
 			res.setHeader('Cache-Control', 'no-cache');
 			res.send(200, sr);
 		});
-	});
+	})
 
-	/*
-	//updates specified catalogue item
-	.put(function(req, res){
-		ServiceRequest.findOne({'_id': req.params.id}, function(err, sr){
+
+	.post(function(req, res){
+		//Changing the state of the SR
+		ServiceRequest.findOne({'id': req.params.id}, function(err, sr){
 			if(err)
 				res.send(err);
-
-			sr.sr_department = req.body.sr_department;
-			sr.sr_title = req.body.sr_title;
-			sr.title = req.body.title;
-			sr.status = req.body.status;
-			sr.approval = req.body.approval;
-			sr.resolve_by = req.body.resolve_by;
-			sr.sr_details = req.body.sr_details;
-			var newLog = {log_by: req.body.currentUser, log_detail: 'change'};
+			var newLog = {'log_by': req.body.currentUser, 'log_detail': req.body.newState};
 			sr.log.push(newLog);
+			if(req.body.newState == "Approved")
+				sr.status = "Created";
+			else
+				sr.status = req.body.newState;
+
 			sr.save(function(err, sr){
 				if(err)
 					res.send(err);
-
-				res.json(sr);
+				res.send({message: "Status changed successfully"});
 			});
 		});
-	})
-
-	//deletes the post
-	.delete(function(req, res) {
-		ServiceRequest.remove({
-			_id: req.params.id
-		}, function(err) {
-			if (err)
-				res.send(err);
-			res.json('Service Request Deleted');
-		});
 	});
-*/
+
+	
 module.exports = router;

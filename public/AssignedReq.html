@@ -35,22 +35,23 @@
     <div class="jumbotron" style="background-color:#ccc;">
     <div class="row">
   <div class="col-md-6">
-        <label >Created By: {{servicereq.created_by}} || {{servicereq.sr_department}}</label><br>
+        <label >Created By: {{servicereq.created_by}}</label><br>
+        <label >Service Request ID: {{servicereq.id}}</label><br>
+        <label >Servicing Department: {{servicereq.sr_department}}</label><br>
         <label >Title: {{servicereq.sr_title}}</label><br>
-        <label >Created On: {{servicereq.created_on}}</label><br>
+        <label >Created On: {{servicereq.created_on | date:"h:mm a 'on' MMM d, y"}}</label><br>
         <label >Status: {{servicereq.status}}</label><br>
-        <label >Approval Status: {{servicereq.approval}}</label><br>
         <label >Details: {{servicereq.sr_details}}</label><br>
-        <label >Resolve By: {{servicereq.resolve_by}}</label><br>
+        <label >Resolve By: {{servicereq.resolve_by | date:"MMM d, y"}}</label><br>
       </div>
 
 
 
   <div class="col-md-6 ">
     <div class="btn-group pull-right" role="group" aria-label="...">
-  <button type="button" class="btn btn-warning" ng-click="inProgSR()">In Progress</button>
-  <button type="button" class="btn btn-success" ng-click="completeSR()">Complete</button>
-  <button type="button" class="btn btn-danger" ng-click="cancelSR()">Cancel</button>
+  <button type="button" class="btn btn-warning" ng-click="changeStatus(servicereq.id, 'In Progress')">In Progress</button>
+  <button type="button" class="btn btn-success" ng-click="changeStatus(servicereq.id, 'Complete')">Complete</button>
+  <button type="button" class="btn btn-danger" ng-click="changeStatus(servicereq.id, 'Cancelled')">Cancel</button>
 </div>
   </div>
 </div>
@@ -61,13 +62,13 @@
   <div class="col-md-4">
     <form ng-submit="addComment()">
       <label>Comments:</label>
-      <textarea class="form-control" rows="5" ng-model="new_comment"></textarea><br>
+      <textarea class="form-control" rows="5" ng-model="new_comment" required></textarea><br>
        <button type="submit" class="btn btn-primary">Add Comment</button>
     </form>
   </div>
   
        
-       <br> <br><br><br><br> <br><br><br><br><br><br><br><br><br>
+       <br> <br><br><br>
        <label>COMMENT TABLE:</label>
           <table id="results"class="table table-striped table-hover text-center table-bordered ">
         <thead>
@@ -101,7 +102,7 @@
         </thead>
         <tbody>
           <tr ng-repeat="logItem in servicereq.log | orderBy: 'date':true">
-            <td>{{logItem.log_date}}</td>
+            <td>{{logItem.log_date | date:"h:mm a 'on' MMM d, y"}}</td>
             <td>{{logItem.log_by}}</td>
             <td>{{logItem.log_detail}}</td>  
           </tr>

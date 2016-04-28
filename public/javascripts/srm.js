@@ -546,32 +546,25 @@ app.controller('editSRController', function($scope, $rootScope, $http, srViewSer
 		})
 		.error(function(data){
 			$scope.error_message = "Error adding comment, please contact your administrator";
+		});	
+	}
+
+	
+	$scope.changeStatus = function(sr, newState){
+		//Changing status of the SR by privileged user or service provider
+		$http.post('/sr/item/' + sr, {'newState': newState, 'currentUser': $rootScope.currentUser}).success(function(data){
+			$scope.servicereq = srViewService.get({id: $rootScope.workSR}, function(fetchedSR){ },
+			function(fetchedSR){
+				$scope.error_message = "Error has occurred, please contact your adminisrator";
+			});
+		})
+		.error(function(data){
+			$scope.error_message = "Error adding comment, please contact your administrator";
 		});
-
-		
 	}
 
-/*
+	
 
-	$scope.approveSR = function(){
-		$scope.servicereq.approval = 1;
-	} 
-
-	$scope.inProgSR = function(){
-		$scope.servicereq.status = 'In Progress';
-	} 
-	$scope.completeSR = function(){
-		$scope.servicereq.status = 'Completed';
-	} 
-
-	$scope.cancelSR = function(){
-		$scope.servicereq.status = 'Canceled';
-	}
-
-	$scope.editSR = function(){
-		
-	}
-*/
 });
 
 
