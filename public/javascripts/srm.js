@@ -141,7 +141,11 @@ app.factory('catService', function($resource){
 
 
 app.factory('srService', function($resource){
-	return $resource('/sr/:id', {id:'@id'});
+	return $resource('/sr/:currentUser', {currentUser:'@currentUser'});
+});
+
+app.factory('srViewService', function($resource){
+	return $resource('/sr/item/:id', {id:'@id'});
 });
 
 app.controller('authController', function($scope, $rootScope, $http, $location){
@@ -351,14 +355,25 @@ app.controller('credentialManagementController', function($scope, userService, $
 
 });
 
-app.controller('serviceRequestView', function($scope, srService, $location, $rootScope){
-/*
-	$scope.servicereqs = srService.query();
 
-	$scope.goToReq = function(){
-		$location.path('/reqlist/req');
+
+app.controller('serviceRequestView', function($scope, $http, srService, $location, $rootScope){
+
+	if($rootScope.currentUser){
+		$scope.servicereqs = srService.query({currentUser: $rootScope.currentUser}, function(fetchedUser){ },
+			function(fetchedUser){
+				$scope.error_message = "Error has occurred, please contact your adminisrator";
+		});
 	}
 
+	console.log($scope.servicereqs);
+
+	
+	$scope.goToReq = function(sr){
+		$rootScope.workSR = sr;
+		$location.path('/reqlist/req');
+	}
+	/*
 	$scope.goToPendingReq = function(){
 		$location.path('/preqlist/preq');
 	}
@@ -366,7 +381,8 @@ app.controller('serviceRequestView', function($scope, srService, $location, $roo
 	$scope.goToAssignedReq = function(){
 		$location.path('/areqlist/areq');
 	}
-*/
+	*/
+
 });
 
 
@@ -472,29 +488,40 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 
 });
 
-app.controller('editSRController', function($scope){
 
-/*
-	$scope.servicereq = {
-	created_by: 'Yousef',
-	created_on: '10/01/2015',
-	status: 'In Progress',
-	sr_title: 'Desktop not working',
-	approval: 0,
-	sr_details: 'Not turning on',
-	sr_department: 'Information Technology',
-	resolve_by: '10/5/2015',
-	comments: [{com_date: '10/01/2015', 
-		com_by: 'Yousef',
-		com_text: 'Sorry!'}],
-	log: [{ log_date: '10/01/2015',
-		log_by: 'Yousef',
-		log_detail: 'Create'}]
-	};
+app.controller('editSRController', function($scope, $rootScope, $http, srViewService){
+	if($rootScope.workSR){
+		$scope.servicereq = srViewService.get({id: $rootScope.workSR}, function(fetchedSR){ },
+			function(fetchedSR){
+				$scope.error_message = "Error has occurred, please contact your adminisrator";
+			});
+	}
 
 	$scope.new_comment = '';
+	$scope.error_message = '';
 
-	$scope.error_message = 'Hello!';
+	$scope.addComment = function(){
+		
+		//SAVE COMMENT
+		$scope.dataSent = {
+			'currentUser': $rootScope.currentUser,
+			'commentText': $scope.new_comment
+		};
+		$http.post('/sr/comment/' + $scope.servicereq.id, $scope.dataSent).success(function(data){
+			$scope.servicereq = srViewService.get({id: $rootScope.workSR}, function(fetchedSR){ },
+			function(fetchedSR){
+				$scope.error_message = "Error has occurred, please contact your adminisrator";
+			});
+			$scope.new_comment = '';
+		})
+		.error(function(data){
+			$scope.error_message = "Error adding comment, please contact your administrator";
+		});
+
+		
+	}
+
+/*
 
 	$scope.approveSR = function(){
 		$scope.servicereq.approval = 1;
@@ -510,14 +537,7 @@ app.controller('editSRController', function($scope){
 	$scope.cancelSR = function(){
 		$scope.servicereq.status = 'Canceled';
 	}
-
-	$scope.newComment = {com_date: Date.now(), com_by: $scope.servicereq.created_by, com_text: $scope.new_comment};
-	$scope.addComment = function(){
-		$scope.newComment = {com_date: Date.now(), com_by: $scope.servicereq.created_by, com_text: $scope.new_comment};
-		$scope.servicereq.comments.push($scope.newComment);
-		$scope.new_comment = '';
-	}
-	*/
+*/
 });
 
 

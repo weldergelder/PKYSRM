@@ -26,7 +26,8 @@ router.route('/')
 
 		var newLog = {'log_by': req.body.sr_currentUser, 'log_detail': 'create'};
 		newSR.log.push(newLog);
-
+		//var newComment = {'com_by': '', 'com_text': ''};
+		//newSR.comments.push(newComment);
 
 		newSR.save(function(err, newSR) {
 			if (err)
@@ -35,11 +36,24 @@ router.route('/')
 		});
 		
 	});
-/*
 
-	//gets all catalogue items
+router.route('/:currentUser')
+
+		//gets catalogue items made by a single user
 	.get(function(req, res){
-		ServiceRequest.find(function(err, allSR){
+		ServiceRequest.find({'created_by': req.params.currentUser}, function(err, allSR){
+			if(err){
+				return res.send(err);
+			}
+			res.setHeader('Cache-Control', 'no-cache');
+			return res.send(200,allSR);
+		});
+	});
+
+router.route('/list')
+	//gets catalogue items made by a single user
+	.put(function(req, res){
+		ServiceRequest.find({'created_by': req.body.currentUser}, function(err, allSR){
 			if(err){
 				return res.send(err);
 			}
@@ -47,34 +61,36 @@ router.route('/')
 		});
 	});
 
-
+//adding a new comment
 router.route('/comment/:id')
 	.post(function(req, res){
-		ServiceRequest.findOne({'_id': req.params.id}, function(err, sr){
+		ServiceRequest.findOne({'id': req.params.id}, function(err, sr){
 			if(err)
 				res.send(err);
-			newComment = {'com_by': req.body.currentUser, 'com_text': req.body.commentText}
+			newComment = {'com_by': req.body.currentUser, 'com_text': req.body.commentText};
 			sr.comments.push(newComment);
 			sr.save(function(err, sr){
 				if(err)
 					res.send(err);
-				return res.json(sr);
+				return res.send(sr);
 			});
 		});
 	});
 
 
-
 //catalogue item specific functions
-router.route('/:id')
-	//gets specified catalogue item
+router.route('/item/:id')
+	//gets specified catalogue item with given id
 	.get(function(req, res){
-		ServiceRequest.findOne({'_id': req.params.id}, function(err, sr){
+		ServiceRequest.findOne({'id': req.params.id}, function(err, sr){
 			if(err)
 				res.send(err);
-			res.json(sr);
+			res.setHeader('Cache-Control', 'no-cache');
+			res.send(200, sr);
 		});
-	}) 
+	});
+
+	/*
 	//updates specified catalogue item
 	.put(function(req, res){
 		ServiceRequest.findOne({'_id': req.params.id}, function(err, sr){
@@ -98,6 +114,7 @@ router.route('/:id')
 			});
 		});
 	})
+
 	//deletes the post
 	.delete(function(req, res) {
 		ServiceRequest.remove({

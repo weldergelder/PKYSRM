@@ -125,6 +125,7 @@ router.route('/item/:title')
 			if(err)
 				res.send({message: 'Error has occurred, please try later'});
 			var data = {};
+
 			item.subcategories[0].titles.forEach(function(selectedTitle){
 				if(selectedTitle.title == req.params.title){
 					data = {'department': item.department, 'sub_category': item.subcategories[0].sub_category,

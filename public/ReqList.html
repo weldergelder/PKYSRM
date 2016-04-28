@@ -43,7 +43,7 @@
         <thead>
           <tr>
               
-              <th class="text-center" data-field="createdby">Created By</th>
+              <th class="text-center" data-field="createdby">ID</th>
               <th class="text-center" data-field="title">Title</th>
               <th class="text-center" data-field="status">Status</th>
               <th class="text-center" data-field="date">Date Created</th>
@@ -55,13 +55,13 @@
         </thead>
 
         <tbody>
-          <tr ng-repeat="servicereq in servicereqs | orderBy: 'servicereq.created_on':true | filterSR:currentUser">
-            <td>{{servicereq.created_by}}</td>
+          <tr ng-repeat="servicereq in servicereqs | orderBy: 'servicereq.created_on': true">
+            <td>{{servicereq.id}}</td>
             <td>{{servicereq.sr_title}}</td>
             <td>{{servicereq.status}}</td> 
-            <td>{{servicereq.created_on}}</td>   
+            <td>{{servicereq.created_on | date:"MMM d, y"}}</td>   
             <td>
-            <button type="button" ng-click="goToReq()" class="btn btn-success btn-sm">
+            <button type="button" ng-click="goToReq(servicereq.id)" class="btn btn-success btn-sm">
               <span class="glyphicon glyphicon-eye-open"></span>
             </button>
             </td>
