@@ -36,7 +36,7 @@
     <div class="container " ng-show="authenticated">
       <div class="jumbotron" style="background-color:#ccc;">
    	 <!-- <p>{{error_message}}</p>-->
-        <form class="form-horizontal" ng-submit="submitRequest()">
+        <form class="form-horizontal">
           <div class="form-group">
             <label class="control-label">Department</label>
             <select class="form-control" ng-model="sr_department" ng-click="getCategories()" required>
@@ -70,7 +70,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-offset-10 col-sm-10">
-              <button type="submit" class="btn btn-primary btn-lg" >Submit</button>
+              <button type="submit" data-target="#confirm-submit" data-toggle="modal" class="btn btn-primary btn-lg" >Submit</button>
             </div>
           </div>
         </form>
@@ -84,6 +84,62 @@
              <button type="button" ng-click="logout()" class="btn btn-primary btn-lg btn-block">Log In</button>
         </div>
         </div>
+
+
+
+        <!--modal for confirming data-->
+  <div class="modal fade" id="confirm-submit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4><span class="glyphicon glyphicon-floppy-saved"></span>    Confirm Submition</h4>
+            </div>
+            <div class="modal-body"><span class="glyphicon glyphicon-question-sign"></span>
+                Are you sure you want to submit the following details?
+                <br><br><br>
+                <table class="table table-striped">
+                    <tr>
+                        <th>Department</th>
+                        <td>{{sr_department}}</td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td>{{sr_category}}</td>
+                    </tr>
+                    <tr>
+                        <th>Title</th>
+                        <td>{{sr_title}}</td>
+                    </tr>
+                    <tr>
+                        <th>Details</th>
+                        <td>{{sr_detail}}</td>
+                    </tr>
+                    <tr>
+                        <th>ETA</th>
+                        <td>{{sr_eta}}</td>
+                    </tr>
+                    <tr>
+                        <th>Privilege Level</th>
+                        <td>{{sr_privilege_level}}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{sr_desc}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="submit" id="submit" class="btn btn-success success" data-dismiss="modal" ng-click="submitRequest()">Submit</button>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+        <!--end of modal for confirming data-->
 
 <div class="modal" id="logout-modal" role="dialog" >
   <div class="modal-dialog modal-sm">

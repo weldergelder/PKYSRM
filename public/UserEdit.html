@@ -43,7 +43,9 @@
         <input required type="text" class="form-control" placeholder="First Name" required ng-model="user.first_name"><br>
         <label>Last Name: </label>
         <input requied type="text" class="form-control"  placeholder="Last Name" required ng-model="user.last_name"><br>
-        <label >Username: {{user.username}}</label>
+        <label >Username: {{user.username}}</label><br>
+        <label >Email (used only for notifications):</label>
+        <input type="email" class="form-control" placeholder="example@provider.com" required ng-model="user.email"><br>
         <br><br>
         <label >Department:</label>
         <select required class="form-control" ng-model="user.department">

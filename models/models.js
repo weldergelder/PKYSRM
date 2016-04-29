@@ -9,6 +9,7 @@ var userSchema = new mongoose.Schema({
 	provider: {type: Number, default: 0},
 	first_name: String,
 	last_name: String,
+	email: String,
 	log: [{ log_date: {type: Date, default: Date.now},
 		log_by: String,
 		log_detail: String}]

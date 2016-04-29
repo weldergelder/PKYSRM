@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require( 'mongoose' );
 var ServiceRequest = mongoose.model('ServiceRequest');
-
+var User = mongoose.model('User');
+var emailutil = require('../nodeutil/emailutil.js');
 var moment = require('moment');
 
 
@@ -35,7 +36,6 @@ router.route('/')
 	});
 
 router.route('/:currentUser')
-
 		//gets catalogue items made by a single user
 	.get(function(req, res){
 		ServiceRequest.find({'created_by': req.params.currentUser}, function(err, allSR){
@@ -127,7 +127,12 @@ router.route('/item/:id')
 			sr.save(function(err, sr){
 				if(err)
 					res.send(err);
-				res.send({message: "Status changed successfully"});
+				User.findOne({'username': sr.created_by}, function(err, user){
+					if(err)
+						res.send(err);
+					emailutil.sendEmail(user.email, req.body.newState, req.body.currentUser, req.params.id);
+					res.send({message: "Status changed successfully"});
+				});
 			});
 		});
 	});

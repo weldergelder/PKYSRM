@@ -1,2 +1,7 @@
-pkysrm@outlook.com
-comp680!
+email: pkysrm@outlook.com
+password: comp680!
+
+uri: https://prod-05.northcentralus.logic.azure.com:443/workflows/a87305cecf5646229d210e7ef8fa37ec/triggers/manual/run?api-version=2015-08-01-preview&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_oIBOf7amPzJKL9tX-f0frn6kpy4M4ISexTRq5OIE3Y
+
+header --> Content-Type: application/json
+body --> {'SendEmail_To': 'email@emailprovider.com', 'SendEmail_Body': 'Message Body'}

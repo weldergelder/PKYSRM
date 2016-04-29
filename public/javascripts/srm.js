@@ -12,6 +12,39 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 
 	$rootScope.workRole = "";
 
+	$rootScope.password = "";
+	$rootScope.repeatPassword = "";
+	$rootScope.passError = "";
+
+	$rootScope.chPass = function(pass, pass2){
+
+		if(pass == pass2 && $rootScope.authenticated && pass != '')
+		{
+			$rootScope.passError = '';
+
+			var dataSent = {'username': $rootScope.currentUser,'password': pass, 'currentUser': $rootScope.currentUser};
+
+			$http.put('/cred/pwd', dataSent).success(function(data){
+				$rootScope.passError = 'Password changed successfully';
+				$rootScope.password = '';
+				$rootScope.repeatPassword = '';
+
+			})
+		
+			.error(function(data){
+				$rootScope.passError = 'Error has occurred, please contact your administrator';
+			}); 
+		}
+		else
+		{
+			$rootScope.passError = "Passwords to not match";
+			$rootScope.password = '';
+			$rootScope.repeatPassword = '';
+		}
+
+
+	};
+
 	$rootScope.goHome = function(){
 		$location.path('/home');
 	};
@@ -40,6 +73,7 @@ var app = angular.module('srmApp', ['ngRoute', 'ngResource']).run(function($root
 	};
 
 	$rootScope.logout = function(){
+		$rootScope.modalShow = false;
 		$http.get('/auth/signout');
 		$rootScope.authenticated = false;
 		$rootScope.currentUser = ""
@@ -353,8 +387,6 @@ app.controller('credentialManagementController', function($scope, userService, $
 		$location.path('/listuser/edituser');
 	}
 
-
-
 });
 
 app.factory('srListService', function($resource){
@@ -412,13 +444,11 @@ app.controller('serviceRequestView', function($scope, $http, srService, srListSe
 		$location.path('/areqlist/areq');
 	}
 
-
 });
 
 
 app.controller('homeController', function($scope, $location, $rootScope){
 	
-
 	$scope.goToNewReq = function(){
 		$location.path('/new');
 	}
@@ -438,14 +468,16 @@ app.controller('addUserController', function($scope, $http, $rootScope){
 		username: '',
 		password: '',
 		department:'',
+		email: '',
 		privilege_level: 0,
 		provider: 0,
 		currentUser: $rootScope.currentUser
-
 	};
+
 	$scope.error_message = '';
 
 	$scope.signup = function(){
+
 		$http.post('/auth/signup', $scope.user).success(function(data){
 			$scope.error_message = data.message;
 			if(data.state == 'success'){
@@ -455,17 +487,16 @@ app.controller('addUserController', function($scope, $http, $rootScope){
 					username: '',
 					password: '',
 					department:'',
+					email: '',
 					privilege_level: 0,
 					provider: 0
 				}
 			}
-
 		})
 
 		.error(function(data){
 			$scope.error_message = "Error has occurred, please contact your administrator";
 		});
-
 
 	};
 	
@@ -481,8 +512,17 @@ app.controller('editUserController', function($scope, userService, $rootScope, $
 	$scope.error_message = '';
 
 	$scope.editUser = function(){
-		$scope.dataSent = {'username': $scope.user.username, 'department': $scope.user.department, 'privilege': $scope.user.privilege,
-			'provider': $scope.user.provider, 'first_name': $scope.user.first_name, 'last_name': $scope.user.last_name, 'currentUser': $rootScope.currentUser};
+		$scope.dataSent = {
+			'username': $scope.user.username,
+			'department': $scope.user.department,
+			'email': $scope.user.email,
+			'privilege': $scope.user.privilege,
+			'provider': $scope.user.provider,
+			'first_name': $scope.user.first_name,
+			'last_name': $scope.user.last_name,
+			'currentUser': $rootScope.currentUser
+		};
+
 		$http.put('/cred/' + $scope.user.username, $scope.dataSent).success(function(data){
 			$scope.error_message = 'Account updated successfully';
 		})
@@ -562,8 +602,6 @@ app.controller('editSRController', function($scope, $rootScope, $http, srViewSer
 			$scope.error_message = "Error adding comment, please contact your administrator";
 		});
 	}
-
-	
 
 });
 

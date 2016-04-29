@@ -77,6 +77,7 @@ module.exports = function(passport){
 					newUser.password = authutil.createHash(password);
 					newUser.department = req.body.department;
 					newUser.privilege = req.body.privilege_level;
+					newUser.email = req.body.email;
 					newUser.provider = req.body.provider;
 					newUser.first_name = req.body.first_name;
 					newUser.last_name = req.body.last_name;
